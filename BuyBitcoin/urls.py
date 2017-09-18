@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from graphene_django.views import GraphQLView
 
 # Move this later --START--
 from django.shortcuts import render_to_response
@@ -31,5 +32,6 @@ def login():
 urlpatterns = [
     url(r'^auth$', login),
     url(r'^admin/', admin.site.urls),
+    url(r'^graphql', GraphQLView.as_view(graphiql=True)),
     url('', include('social_django.urls', namespace='social'))
 ]
