@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import dj_database_url
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,8 +54,9 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'BuyBitcoin.urls'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get(
+    'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 LOGIN_REDIRECT_URL = '/'
 
 TEMPLATES = [
@@ -97,7 +98,8 @@ if 'TRAVIS' in os.environ:
         'PORT':     '',
     }
 else:
-    DATABASES['default'] = dj_database_url.config(default="postgres://bitcoin:stupid_pw@localhost/buy_bitcoin")
+    DATABASES['default'] = dj_database_url.config(
+        default="postgres://bitcoin:stupid_pw@localhost/buy_bitcoin")
 
 
 # Password validation
