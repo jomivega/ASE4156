@@ -19,6 +19,7 @@ from django.contrib import admin
 # Move this later --START--
 from django.shortcuts import render_to_response
 
+from stocks import historical
 
 def login():
     """
@@ -27,9 +28,9 @@ def login():
     return render_to_response('auth.html')
 # --END--
 
-
 urlpatterns = [
     url(r'^auth$', login),
     url(r'^admin/', admin.site.urls),
-    url('', include('social_django.urls', namespace='social'))
+    url('', include('social_django.urls', namespace='social')),
+    url(r'^stocks/addstock/', historical.loadData10YearsBackFromTodayForStock)
 ]
