@@ -6,7 +6,7 @@ from graphene import AbstractType, Field, relay
 class GUser(DjangoObjectType):
     class Meta:
         model = User
-        only_fields = ('id', 'username')
+        only_fields = ('id', 'trading_accounts', 'username')
         interfaces = (relay.Node, )
 
 
