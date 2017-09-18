@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social_django',
+    'graphene_django',
     # Our apps
+    'authentication',
     'stocks',
     'trading',
 ]
@@ -143,3 +145,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+# GraphQL
+
+GRAPHENE = {
+    'SCHEMA': 'BuyBitcoin.graphene_schema.SCHEMA'
+}

@@ -15,21 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-
-# Move this later --START--
-from django.shortcuts import render_to_response
-
-
-def login():
-    """
-    Dummy function to render login page
-    """
-    return render_to_response('auth.html')
-# --END--
+from graphene_django.views import GraphQLView
+from authentication.views import login
 
 
 urlpatterns = [
     url(r'^auth$', login),
     url(r'^admin/', admin.site.urls),
+    url(r'^graphql', GraphQLView.as_view(graphiql=True)),
     url('', include('social_django.urls', namespace='social'))
 ]
