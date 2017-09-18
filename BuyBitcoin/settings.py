@@ -39,9 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social_django',
+<<<<<<< HEAD
     # Our apps
     'stocks',
     'trading',
+=======
+    'BuyBitcoin',
+>>>>>>> Initial Schema
 ]
 
 MIDDLEWARE_CLASSES = [
