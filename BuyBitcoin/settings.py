@@ -146,5 +146,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 GRAPHENE = {
-    'SCHEMA': 'BuyBitcoin.graphene_schema.schema'
+    'SCHEMA': 'BuyBitcoin.graphene_schema.SCHEMA'
 }

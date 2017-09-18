@@ -13,6 +13,8 @@ class GUser(DjangoObjectType):
 class Query(AbstractType):
     viewer = Field(GUser, )
 
-    @classmethod
+    @staticmethod
     def resolve_viewer(cls, args, context, info):
+        if not context.user.is_authenticated():
+            return None
         return context.user

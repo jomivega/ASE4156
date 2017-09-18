@@ -16,17 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from graphene_django.views import GraphQLView
-
-# Move this later --START--
-from django.shortcuts import render_to_response
-
-
-def login():
-    """
-    Dummy function to render login page
-    """
-    return render_to_response('auth.html')
-# --END--
+from authentication.views import login
 
 
 urlpatterns = [
