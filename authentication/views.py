@@ -1,3 +1,6 @@
+"""
+Views for authentication. Basically supports login/logout.
+"""
 from django.shortcuts import render
 
 

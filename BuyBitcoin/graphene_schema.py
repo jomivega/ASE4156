@@ -19,6 +19,7 @@ class Query(
     Combination of all queries of all apps
     """
     pass
+# pylint: enable=too-few-public-methods
 
 
 SCHEMA = graphene.Schema(query=Query)
