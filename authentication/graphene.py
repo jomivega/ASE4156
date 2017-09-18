@@ -1,12 +1,18 @@
 from graphene_django import DjangoObjectType
 from django.contrib.auth.models import User
-from graphene import AbstractType
+from graphene import AbstractType, Field, relay
 
 
 class GUser(DjangoObjectType):
     class Meta:
         model = User
+        only_fields = ('id', 'username')
+        interfaces = (relay.Node, )
 
 
 class Query(AbstractType):
-    pass
+    viewer = Field(GUser, )
+
+    @classmethod
+    def resolve_viewer(cls, args, context, info):
+        return context.user

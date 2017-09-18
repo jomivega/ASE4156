@@ -1,21 +1,19 @@
 from graphene_django import DjangoObjectType
 from .models import DailyStockQuote, Stock
-from graphene_django import DjangoObjectType
-from graphene import AbstractType, List
+from graphene import AbstractType, relay
 
 
 class GStock(DjangoObjectType):
     class Meta:
         model = Stock
+        interfaces = (relay.Node, )
 
 
 class GDailyStockQuote(DjangoObjectType):
     class Meta:
         model = DailyStockQuote
+        interfaces = (relay.Node, )
 
 
 class Query(AbstractType):
-    all_stocks = List(GStock)
-
-    def resolve_all_stocks(self, info, **kwargs):
-        return Stock.objects.all()
+    pass
