@@ -104,3 +104,4 @@ ENV/
 # JS
 webpack-stats.json
 node_modules
+assets
