@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 # Move this later --START--
 from django.shortcuts import render_to_response
@@ -31,5 +32,6 @@ def login():
 urlpatterns = [
     url(r'^auth$', login),
     url(r'^admin/', admin.site.urls),
-    url('', include('social_django.urls', namespace='social'))
+    url('', include('social_django.urls', namespace='social')),
+    url(r'^home$', TemplateView.as_view(template_name="home.html"))
 ]

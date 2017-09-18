@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+
+# JS
+webpack-stats.json
+node_modules

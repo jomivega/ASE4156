@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social_django',
+    'webpack_loader',
     # Our apps
     'stocks',
     'trading',
@@ -66,7 +67,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            './BuyBitcoin'
+            './BuyBitcoin/templates'
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -142,3 +143,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# JS
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'assets'),
+)
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': '/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
