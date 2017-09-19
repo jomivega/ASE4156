@@ -16,17 +16,17 @@ import dj_database_url
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_t(k02lqu$@0m9jv74(@nst@fpxnh3@q3&7!&n7u8w09luh!(0'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.environ.get('DEBUG') == "TRUE" else False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['trading-stuff.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -37,15 +37,21 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'whitenoise.runserver_nostatic',
+
     'django.contrib.staticfiles',
+    'graphene_django',
     'social_django',
+    'webpack_loader',
     # Our apps
+    'authentication',
     'stocks',
     'trading',
 ]
 
 MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -66,7 +72,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            './BuyBitcoin'
+            './BuyBitcoin/templates'
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -90,7 +96,12 @@ AUTHENTICATION_BACKENDS = (
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
-DATABASES = {}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 if 'TRAVIS' in os.environ:
     DATABASES['default'] = {
         'ENGINE':   'django.db.backends.postgresql_psycopg2',
@@ -101,8 +112,7 @@ if 'TRAVIS' in os.environ:
         'PORT':     '',
     }
 else:
-    DATABASES['default'] = dj_database_url.config(
-        default="postgres://bitcoin:stupid_pw@localhost/buy_bitcoin")
+    DATABASES['default'].update(dj_database_url.config(conn_max_age=500))
 
 
 # Password validation
@@ -138,7 +148,26 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+    os.path.join(BASE_DIR, 'assets'),
+)
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': '/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
+
+
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# GraphQL
+
+GRAPHENE = {
+    'SCHEMA': 'BuyBitcoin.graphene_schema.SCHEMA'
+}
