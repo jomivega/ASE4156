@@ -4,6 +4,10 @@ GraphQL definitions for the Authentication App
 from graphene_django import DjangoObjectType
 from django.contrib.auth.models import User
 from graphene import AbstractType, Field, relay
+import graphene
+from trading.models import TradingAccount
+from trading.graphene import GTradingAccount
+from .models import Profile
 
 
 # pylint: disable=too-few-public-methods
@@ -17,8 +21,20 @@ class GUser(DjangoObjectType):
         the whole usere object
         """
         model = User
-        only_fields = ('id', 'trading_accounts', 'username')
+        only_fields = ('id', 'profile', 'username')
         interfaces = (relay.Node, )
+
+
+class GProfile(DjangoObjectType):
+    """
+    GraphQL representation of a Profile
+    """
+    class Meta:
+        """
+        Meta Model for Profile
+        """
+        model = Profile
+        only_fields = ('id', 'trading_accounts')
 
 
 # pylint: disable=no-init
@@ -36,5 +52,29 @@ class Query(AbstractType):
         if not context.user.is_authenticated():
             return None
         return context.user
-# pylint: enable=too-few-public-methods
 # pylint: enable=no-init
+
+
+class AddTradingAccount(graphene.Mutation):
+    """
+    AddTradingAccount creates a new TradingAccount for the user
+    """
+    class Input:
+        """
+        Input to create a trading account. Right now it's only a name.
+        """
+        name = graphene.String()
+    account = graphene.Field(lambda: GTradingAccount)
+
+    @staticmethod
+    def mutate(_, args, context, __):
+        """
+        Creates a TradingAccount and saves it to the DB
+        """
+        account = TradingAccount(
+            profile=context.user.profile,
+            account_name=args['name']
+        )
+        account.save()
+        return AddTradingAccount(account=account)
+# pylint: enable=too-few-public-methods
