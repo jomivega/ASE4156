@@ -18,10 +18,12 @@ def loadData10YearsBackFromTodayForStock(request):
         tenBack = getDateArrayForFetcher(tenBack)
         fetcher = Fetcher(ticker, tenBack, now)
         history = fetcher.getHistorical()
+        objects = []
         for row in history.itertuples():
             value = getattr(row, "Close")
             date = getattr(row, "Date")
-            DailyStockQuote(value=value, date=date, stock=stock).save()
+            objects.append(DailyStockQuote(value=value, date=date, stock=stock))
+        DailyStockQuote.objects.bulk_create(objects, batch_size=500)
 
 def getDateArrayForFetcher(arrowDate):
     """Function that formats arrow date to Yahoo Fetcher format """

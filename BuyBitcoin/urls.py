@@ -32,5 +32,5 @@ urlpatterns = [
     url(r'^auth$', login),
     url(r'^admin/', admin.site.urls),
     url('', include('social_django.urls', namespace='social')),
-    url(r'^stocks/addstock/', historical.loadData10YearsBackFromTodayForStock)
+    url(r'^stocks/addstock/', historical.loadData10YearsBackFromTodayForStock),
 ]
