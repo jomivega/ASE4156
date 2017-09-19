@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'authentication',
     'stocks',
     'trading',
+    'wf',
 ]
 
 MIDDLEWARE_CLASSES = [
