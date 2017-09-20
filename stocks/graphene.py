@@ -2,6 +2,7 @@
 GraphQL definitions for the Stocks App
 """
 from graphene_django import DjangoObjectType
+from trading.models import Trade
 from graphene import AbstractType, Argument, List, NonNull, String, relay
 from .models import DailyStockQuote, Stock
 
@@ -17,6 +18,16 @@ class GDailyStockQuote(DjangoObjectType):
         """
         model = DailyStockQuote
         interfaces = (relay.Node, )
+
+    @staticmethod
+    def resolve_trades(stock, _, context, __):
+        """
+        We need to apply permission checks to trades
+        """
+        return (Trade
+                .objects
+                .filter(stock_id=stock.id)
+                .filter(account__profile_id=context.user.profile.id))
 
 
 class GStock(DjangoObjectType):
