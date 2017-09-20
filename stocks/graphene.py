@@ -2,9 +2,11 @@
 GraphQL definitions for the Stocks App
 """
 from graphene_django import DjangoObjectType
-from trading.models import Trade
 from graphene import AbstractType, Argument, List, NonNull, String, relay
+import graphene
+from trading.models import Trade
 from .models import DailyStockQuote, Stock
+from .historical import create_new_stock
 
 
 # pylint: disable=too-few-public-methods
@@ -55,6 +57,26 @@ class GStock(DjangoObjectType):
                 .filter(date__gte=args['start'])
                 .filter(date__lte=args['end'])
                 .order_by('date'))
+
+
+class AddStock(graphene.Mutation):
+    """
+    AddStock creates a new Stock that is tracked
+    """
+    class Input:
+        """
+        Input to create a stock. We only need the ticker.
+        """
+        ticker = graphene.NonNull(graphene.String)
+        name = graphene.NonNull(graphene.String)
+    stock = graphene.Field(lambda: GStock)
+
+    @staticmethod
+    def mutate(_, args, __, ___):
+        """
+        Creates a Stock and saves it to the DB
+        """
+        return AddStock(stock=create_new_stock(args['ticker'], args['name']))
 
 
 # pylint: disable=no-init
