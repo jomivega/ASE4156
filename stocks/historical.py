@@ -36,8 +36,7 @@ def fill_stocks(request):
         stock_id_field = 'stock_id'
         stock_ticker = 'stock__ticker'
         date = 'date'
-        data = DailyStockQuote.objects.values(stock_ticker, stock_id_field)\
-                .annotate(date=Max(date))
+        data = DailyStockQuote.objects.values(stock_ticker, stock_id_field).annotate(date=Max(date))
         for stock in data:
             last_date = arrow.get(stock[date]).replace(days=+1)
             last_date = get_date_array_for_fetcher(last_date)
