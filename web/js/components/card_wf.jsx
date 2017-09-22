@@ -7,7 +7,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import Paper from 'material-ui/Paper';
 
 
-export class Card_WF extends React.Component {
+export class CardWF extends React.Component {
   render() {
     return (
         <Card zDepth={3}>
@@ -20,7 +20,7 @@ export class Card_WF extends React.Component {
   }
 }
 
-export class Media_Card_WF extends React.Component {
+export class MediaCardWF extends React.Component {
     render() {
         return (
         <Card zDepth={3}>

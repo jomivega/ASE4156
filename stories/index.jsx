@@ -10,7 +10,7 @@ import { Button, Welcome } from '@storybook/react/demo';
 
 import Shares from '../web/js/components/shares';
 import AppBar from '../web/js/components/appbar';
-import {Card_WF, Media_Card_WF} from '../web/js/components/card_wf';
+import {CardWF, MediaCardWF} from '../web/js/components/card_wf';
 
 
 storiesOf('Shares', module)
@@ -24,5 +24,5 @@ storiesOf('AppBar', module)
 
 storiesOf('Cards', module)
   .addDecorator(muiTheme(appTheme))
-  .add('Simple card', () => <Card_WF title="Title" subtitle="sub" cardText="fdsa"/>)
-  .add('Content card', () => <Media_Card_WF content = {<h1>Content</h1>}/>);
+  .add('Simple card', () => <CardWF title="Title" subtitle="sub" cardText="fdsa"/>)
+  .add('Content card', () => <MediaCardWF content = {<h1>Content</h1>}/>);
