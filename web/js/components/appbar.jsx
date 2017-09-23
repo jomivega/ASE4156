@@ -10,9 +10,9 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 export default class App_Bar extends React.Component {
   render() {
     return (
-            <AppBar title="Wells Fargo"
-                        iconClassNameRight="muidocs-icon-navigation-expand-more"
-                        />        
+    <AppBar title="Wells Fargo"
+      iconClassNameRight="muidocs-icon-navigation-expand-more"
+    />
     );
   }
 }
