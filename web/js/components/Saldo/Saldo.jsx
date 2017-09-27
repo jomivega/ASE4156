@@ -62,7 +62,7 @@ class Saldo extends React.Component {
   }
   renderCard(values : Array < React$Element < {} >>, bottom : React$Element < {} >, button : React$Element <*>) : React$Element < {} > {
     return(
-      <Card>
+      <Card zDepth={3}>
         <CardHeader title="Saldo"/>
         <CardText>
           <Table>
