@@ -1,6 +1,8 @@
 """
 Views for authentication. Basically supports login/logout.
 """
+import datetime
+import os
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib.auth import logout as log_out
@@ -9,10 +11,10 @@ import plaid
 from authentication.models import UserBank
 
 
-PLAID_CLIENT_ID = '59c3248dbdc6a40ac87ed3e8'
-PLAID_SECRET = 'ee7f10de9feb7d6408d1f5bd980f2a'
-PLAID_PUBLIC_KEY = '2aa70186194f3a8d2038d989715a32'
-PLAID_ENV = 'sandbox'
+PLAID_CLIENT_ID = os.environ.get('PLAID_CLIENT_ID')
+PLAID_SECRET = os.environ.get('PLAID_SECRET')
+PLAID_PUBLIC_KEY = os.environ.get('PLAID_PUBLIC_KEY')
+PLAID_ENV = 'sandbox' if os.environ.get('DEBUG') == "TRUE" else 'development'
 
 
 def login(request):
@@ -74,8 +76,11 @@ def list_transactions(request):
         if user_bank.user == request.user:
             client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
                                   public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
+            start = datetime.datetime.now() - datetime.timedelta(days=365)
+            start = start.strftime("%Y-%m-%d")
+            end = datetime.datetime.now().strftime("%Y-%m-%d")
             response = client.Transactions.get(user_bank.access_token,
-                                               start_date='2016-07-12', end_date='2017-01-09')
+                                               start_date=start, end_date=end)
             transactions = response['transactions']
             context = {'tx': transactions}
             return render(request, "list_transactions.html", context)
