@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Max
 from .models import Stock, DailyStockQuote
-
+from django.http import  HttpResponse
 
 def create_new_stock(ticker, name):
     """
@@ -37,8 +37,9 @@ def data_ten_years_back_for_stock(request):
         body = request.POST
         name = body['name']
         ticker = body['ticker']
-        create_new_stock(ticker, name)
-
+        stock = create_new_stock(ticker, name)
+        return HttpResponse(stock.name, status=200)
+    return HttpResponse("Service Unavailable 503", status=503)
 
 def get_date_array_for_fetcher(arrow_date):
     """Function that formats arrow date to Yahoo Fetcher format """
