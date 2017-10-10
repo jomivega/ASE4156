@@ -19,7 +19,7 @@ class InvestBucket extends React.Component {
   static defaultProps = {
     attributes: {
       good: [],
-      bad: []
+      bad: [],
     }
   }
   renderAttr(attr, isGood) {
@@ -30,7 +30,7 @@ class InvestBucket extends React.Component {
       indicator = <TrendingDownIcon/>
     }
     return (
-      <ListItem>
+      <ListItem key={attr.shortDesc}>
         <ListItemIcon>
           {indicator}
         </ListItemIcon>
