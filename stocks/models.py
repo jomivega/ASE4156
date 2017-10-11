@@ -36,3 +36,28 @@ class DailyStockQuote(models.Model):
                                        self.value,
                                        self.date,
                                        self.stock_id)
+
+
+class InvestmentBucket(models.Model):
+    """
+    An investment bucket represents a collection of stocks to invest in
+    """
+    name = models.CharField(max_length=255)
+
+
+class InvestmentBucketDescription(models.Model):
+    """
+    An investment bucket represents a collection of stocks to invest in
+    """
+    text = models.CharField(max_length=255)
+    bucket = models.ForeignKey(InvestmentBucket, related_name='description')
+    is_good = models.BooleanField()
+
+
+class InvestmentStockConfiguration(models.Model):
+    """
+    Represents the configuration of how much of a stock to invest for a bucket
+    """
+    quantity = models.DecimalField(max_digits=8, decimal_places=2)
+    stock = models.ForeignKey(Stock, related_name='bucket')
+    bucket = models.ForeignKey(InvestmentBucket, related_name='stocks')
