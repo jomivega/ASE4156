@@ -1,10 +1,11 @@
 """
 GraphQL definitions for the Authentication App
 """
+import datetime
 import os
 from django.contrib.auth.models import User
 from graphene import AbstractType, Argument, Field, Float, List, Mutation, \
-    NonNull, String, relay
+    NonNull, ObjectType, String, relay
 from graphene_django import DjangoObjectType
 from trading.models import TradingAccount
 from trading.graphql import GTradingAccount
@@ -57,29 +58,110 @@ class GProfile(DjangoObjectType):
         return Stock.objects.filter(name__icontains=args['text'])
 
 
+class DataPoint(object):
+    """
+    Dummy class to represent a date / value DataPoint
+    """
+    def __init__(self, date, value):
+        self.date = date
+        self.value = value
+
+
+class GDataPoint(ObjectType):
+    """
+    GraphQL definition of the DataPoint above
+    """
+    date = String()
+    value = Float()
+
+
 class GUserBank(DjangoObjectType):
     """
     GraphQL representation of a UserBank
     """
     balance = Float()
+    income = Float()
+    name = String()
+    outcome = Float()
+    history = List(GDataPoint, args={'start': Argument(NonNull(String))})
 
     class Meta(object):
         """
         Meta Model for UserBank
         """
         model = UserBank
-        only_fields = ('id', 'balance')
+        only_fields = ('id', 'balance', 'income', 'outcome')
         interfaces = (relay.Node, )
+
+    @staticmethod
+    def resolve_history(data, args, _context, _info):
+        """
+        Builds the financial history for the user
+        """
+        client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
+                              public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
+        start = args['start']
+        end = datetime.datetime.now().strftime("%Y-%m-%d")
+        response = client.Transactions.get(data.access_token,
+                                           start_date=start, end_date=end)
+        transactions = response['transactions']
+        value = GUserBank.resolve_balance(data, {}, None, None)
+        value_list = [DataPoint(end, value)]
+        for transaction in transactions:
+            value = value - transaction['amount']
+            if not value_list[-1].date == transaction['date']:
+                value_list.append(DataPoint(transaction['date'], value))
+        return value_list
 
     @staticmethod
     def resolve_balance(data, _args, _context, _info):
         """
-        Finds a stock given a case insensitive name
+        Finds the current balance of the user
         """
         client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
                               public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
         balance = client.Accounts.get(data.access_token)['accounts'][0]['balances']['available']
         return float(balance)
+
+    @staticmethod
+    def resolve_name(data, _args, _context, _info):
+        """
+        Returns the name of the bank account
+        """
+        client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
+                              public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
+        name = client.Accounts.get(data.access_token)['accounts'][0]['name']
+        return name
+
+    @staticmethod
+    def resolve_income(data, _args, _context, _info):
+        """
+        Calculates the income a user has per month
+        """
+        client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
+                              public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
+        start = (datetime.datetime.now() - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+        end = datetime.datetime.now().strftime("%Y-%m-%d")
+        response = client.Transactions.get(data.access_token,
+                                           start_date=start, end_date=end)
+        transactions = response['transactions']
+        plus = sum(filter(lambda x: x > 0, [tx['amount'] for tx in transactions]))
+        return float(plus)
+
+    @staticmethod
+    def resolve_outcome(data, _args, _context, _info):
+        """
+        Calculates the expenses a user has
+        """
+        client = plaid.Client(client_id=PLAID_CLIENT_ID, secret=PLAID_SECRET,
+                              public_key=PLAID_PUBLIC_KEY, environment=PLAID_ENV)
+        start = (datetime.datetime.now() - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+        end = datetime.datetime.now().strftime("%Y-%m-%d")
+        response = client.Transactions.get(data.access_token,
+                                           start_date=start, end_date=end)
+        transactions = response['transactions']
+        plus = sum(filter(lambda x: x < 0, [tx['amount'] for tx in transactions]))
+        return float(plus)
 
 
 # pylint: disable=no-init
