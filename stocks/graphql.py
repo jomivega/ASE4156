@@ -2,8 +2,8 @@
 GraphQL definitions for the Stocks App
 """
 from graphene_django import DjangoObjectType
-from graphene import AbstractType, Argument, Field, Float, List, Mutation, \
-    NonNull, String, relay
+from graphene import AbstractType, Argument, Boolean, Field, Float, List, \
+    Mutation, NonNull, String, relay
 from trading.models import Trade
 from .models import DailyStockQuote, InvestmentBucket, \
     InvestmentBucketDescription, InvestmentStockConfiguration, Stock
@@ -39,12 +39,22 @@ class GInvestmentBucket(DjangoObjectType):
     """
     GraphQL representation of a InvestmentBucket
     """
+    is_owner = Boolean()
+
     class Meta:
         """
         Meta Model for InvestmentBucket
         """
         model = InvestmentBucket
         interfaces = (relay.Node, )
+        only_fields = ('id', 'name', 'public', 'description', 'stocks')
+
+    @staticmethod
+    def resolve_is_owner(data, _args, context, _info):
+        """
+        Returns whether the user ownes the investment bucket
+        """
+        return data.owner.id == context.user.profile.id
 
 
 class GInvestmentStockConfiguration(DjangoObjectType):
@@ -125,14 +135,19 @@ class AddBucket(Mutation):
         We only need the name of the new bucket to create it
         """
         name = NonNull(String)
+        public = NonNull(Boolean)
     bucket = Field(lambda: GInvestmentBucket)
 
     @staticmethod
-    def mutate(_self, args, _context, _info):
+    def mutate(_self, args, context, _info):
         """
         Creates a new InvestmentBucket and saves it to the DB
         """
-        bucket = InvestmentBucket(name=args['name'])
+        bucket = InvestmentBucket(
+            name=args['name'],
+            public=args['public'],
+            owner=context.user.profile,
+        )
         bucket.save()
         return AddBucket(bucket=bucket)
 
@@ -151,11 +166,13 @@ class AddStockToBucket(Mutation):
     bucket = Field(lambda: GInvestmentBucket)
 
     @staticmethod
-    def mutate(_self, args, _context, _info):
+    def mutate(_self, args, context, _info):
         """
         Adds a new stock to a specific bucket
         """
         bucket = InvestmentBucket.objects.get(name=args['bucket_name'])
+        if not bucket.owner.id == context.user.profile.id:
+            raise Exception("You don't own the bucket!")
         stock = Stock.objects.get(ticker=args['ticker'])
         investment = InvestmentStockConfiguration(
             bucket=bucket,
@@ -177,18 +194,27 @@ class AddAttributeToInvestment(Mutation):
         """
         desc = NonNull(String)
         bucket = NonNull(String)
-    bucket = Field(lambda: GInvestmentBucket)
+        is_good = NonNull(Boolean)
+    bucket_attr = Field(lambda: GInvestmentBucketAttribute)
 
     @staticmethod
-    def mutate(_self, args, _context, _info):
+    def mutate(_self, args, context, _info):
         """
         Executes the mutation to add the attribute
         """
-        bucket = InvestmentBucket.objects.get(name=args['bucket'])
-        attribute = InvestmentBucketDescription(text=args['desc'], bucket=bucket)
+        bucket = InvestmentBucket.objects.get(
+            name=args['bucket'],
+            owner__id=context.user.profile.id,
+        )
+        if not bucket or (not bucket.owner.id == context.user.profile.id):
+            raise Exception("You don't own the bucket!")
+        attribute = InvestmentBucketDescription(
+            text=args['desc'],
+            bucket=bucket,
+            is_good=args['is_good'],
+        )
         attribute.save()
-        bucket.refresh_from_db()
-        return AddAttributeToInvestment(bucket=bucket)
+        return AddAttributeToInvestment(bucket_attr=attribute)
 
 
 # pylint: disable=no-init
