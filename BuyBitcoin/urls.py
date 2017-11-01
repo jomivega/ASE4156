@@ -20,7 +20,6 @@ import graphene_django.views
 import authentication.views
 import web.views
 import stocks.historical
-import trading.views
 
 EXECUTOR = ThreadExecutor()
 # pylint: disable=invalid-name
@@ -40,6 +39,5 @@ urlpatterns = [
     url(r'^plaid/get_access_token/$', authentication.views.get_access_token),
     url(r'^plaid/list_transactions/$', authentication.views.list_transactions),
     url(r'^plaid/get_balance/$', authentication.views.get_balance),
-    url(r'^trade/test$', trading.views.test),
 ]
 # pylint: enable=invalid-name

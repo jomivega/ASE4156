@@ -4,7 +4,7 @@ GraphQL definitions for the Trading App
 from graphene_django import DjangoObjectType
 from graphene import AbstractType, Field, Float, Int, Mutation, relay, String
 from stocks.models import Stock
-from .models import TradeStock, TradingAccount
+from .models import Trade, TradingAccount
 
 
 # pylint: disable=too-few-public-methods
@@ -18,7 +18,7 @@ class GTrade(DjangoObjectType):
         """
         Meta Model for Trade
         """
-        model = TradeStock
+        model = Trade
         interfaces = (relay.Node, )
 
     @staticmethod
@@ -73,7 +73,7 @@ class AddTrade(Mutation):
             account_name=args['account_name'],
             profile_id=context.user.profile.id
         )
-        trade = TradeStock(
+        trade = Trade(
             stock=stock,
             quantity=args['quantity'],
             account=account

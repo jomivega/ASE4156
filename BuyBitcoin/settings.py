@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'graphene_django',
     'social_django',
     'webpack_loader',
-    'security',
     # Our apps
     'authentication',
     'stocks',
@@ -66,8 +65,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'authentication.plaid_middleware.PlaidMiddleware',
-    'security.middleware.DoNotTrackMiddleware',
-    'security.middleware.ContentNoSniff',
 ]
 
 ROOT_URLCONF = 'BuyBitcoin.urls'
@@ -183,10 +180,3 @@ WHITENOISE_ROOT = os.path.join(BASE_DIR, 'assets')
 GRAPHENE = {
     'SCHEMA': 'BuyBitcoin.graphene_schema.SCHEMA'
 }
-
-if os.environ.get('DEBUG') != "TRUE" and 'TRAVIS' not in os.environ:
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
